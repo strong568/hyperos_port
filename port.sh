@@ -1342,7 +1342,7 @@ else
         sed -i "s/dtbo.img/dtbo_noksu.img/g" out/${os_type}_${device_code}_${port_rom_version}/windows_flash_script.bat
         sed -i "s/dtbo.img/dtbo_noksu.img/g" out/${os_type}_${device_code}_${port_rom_version}/mac_linux_flash_script.sh
     else
-    bootimg=$(find out/${os_type}_${device_code}_${port_rom_version} -name "boot.img")
+    bootimg=$(find build/baserom/ out/${os_type}_${device_code}_${port_rom_version} -name "boot.img")
     mv -f $bootimg out/${os_type}_${device_code}_${port_rom_version}/boot_official.img
     fi
 
