@@ -566,8 +566,9 @@ fi
 if [[ ${is_eu_rom} == "true" ]];then
     patch_smali "miui-services.jar" "SystemServerImpl.smali" ".method public constructor <init>()V/,/.end method" ".method public constructor <init>()V\n\t.registers 1\n\tinvoke-direct {p0}, Lcom\/android\/server\/SystemServerStub;-><init>()V\n\n\treturn-void\n.end method" "regex"
 
-elif [[ ${port_rom_code} != "sheng" ]] || [[ ${port_rom_code} != "shennong" ]];then
-    
+elif [[ ${port_rom_code} == "sheng" ]];then
+   blue "Skip Signature Verfier fix"
+else 
     if [[ ! -d tmp ]];then
         mkdir -p tmp/
     fi
@@ -700,7 +701,7 @@ for i in $(find build/portrom/images -type f -name "build.prop");do
     sed -i "s/ro.product.system_ext.device=.*/ro.product.system_ext.device=${base_rom_code}/g" ${i}
     sed -i "s/persist.sys.timezone=.*/persist.sys.timezone=Asia\/Shanghai/g" ${i}
     #全局替换device_code
-    if [[ $port_mios_version_incremental != *DEV* ]] || [[ ${port_rom_code} != "sheng" ]] || [[ ${port_rom_code} != "shennong" ]];then
+    if [[ $port_mios_version_incremental != *DEV* ]];then
         sed -i "s/$port_device_code/$base_device_code/g" ${i}
     fi
     # 添加build user信息
