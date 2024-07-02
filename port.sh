@@ -548,7 +548,12 @@ fi
 
 
 
-if [[ ${port_rom_code} != "sheng" ]] || [[ ${port_rom_code} != "shennong" ]];then
+if [[ ${port_rom_code} == "sheng" ]] ;then
+    blue "Skip StrongToast UI fix"
+elif [[ ${port_rom_code} == "houji" ]] || [[ ${port_rom_code} == "shennong" ]] ;then
+    blue "左侧挖孔灵动岛修复" "StrongToast UI fix"
+    patch_smali "MiuiSystemUI.apk" "MIUIStrongToast\$2.smali" "const\/4 v7\, 0x0" "iget-object v7\, v1\, Lcom\/android\/systemui\/toast\/MIUIStrongToast;->mRLLeft:Landroid\/widget\/RelativeLayout;\\n\\tinvoke-virtual {v7}, Landroid\/widget\/RelativeLayout;->getLeft()I\\n\\tmove-result v7\\n\\tint-to-float v7,v7"
+else
 blue "左侧挖孔灵动岛修复" "StrongToast UI fix"
     patch_smali "MiuiSystemUI.apk" "MIUIStrongToast\$2.smali" "const\/4 v9\, 0x0" "iget-object v9\, v1\, Lcom\/android\/systemui\/toast\/MIUIStrongToast;->mRLLeft:Landroid\/widget\/RelativeLayout;\\n\\tinvoke-virtual {v9}, Landroid\/widget\/RelativeLayout;->getLeft()I\\n\\tmove-result v9\\n\\tint-to-float v9,v9"
 fi
