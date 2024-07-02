@@ -1033,6 +1033,9 @@ fi
 for zip in $(find devices/${base_rom_code}/ -name "*.zip"); do
     if unzip -l $zip | grep -q "anykernel.sh" ;then
         blue "检查到第三方内核压缩包 $zip [AnyKernel类型]" "Custom Kernel zip $zip detected [Anykernel]"
+        if [[ ! -d tmp ]];then
+          mkdir tmp
+        fi
         if echo $zip | grep -q ".*-KSU" ; then
           unzip $zip -d tmp/anykernel-ksu/ > /dev/null 2>&1
         elif echo $zip | grep -q ".*-NoKSU" ; then
