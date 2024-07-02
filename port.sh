@@ -882,6 +882,11 @@ if [[ ${port_rom_code} == "sheng" ]];then
     done
 fi
 
+if [ $(grep -c "sm8250" "build/portrom/images/vendor/build.prop") -ne 0 ];then
+    blue "修改CIT扬声器校准" "Fix Spkcal CIT test for sm8250"
+    cp -rf devices/common/overlay/system_ext/bin/* build/portrom/images/system_ext/bin/
+fi
+
 #自定义替换
 
 #Add perfect icons
