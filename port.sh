@@ -1182,7 +1182,7 @@ if [ "$pack_type" = "EXT" ];then
         eval "$i"_size=$(echo "$(eval echo "$"$i"_size") - $size_free" | bc)
         eval "$i"_size=$(echo "$(eval echo "$"$i"_size") * 4096 / 4096 / 4096" | bc)
         sudo rm -rf build/portrom/images/$i.img
-        blue "二次生成: $i" "Regenerate $i
+        blue "二次生成: $i" "Regenerate $i"
         mke2fs -O ^has_journal -L $i -I 256 -N $(eval echo "$"$i"_inode") -M /$i -m 0 -t ext4 -b 4096 build/portrom/images/$i.img $(eval echo "$"$i"_size") || false
         if [[ "${ext_rw}" == "true" ]]; then
             e2fsdroid -e -T 1230768000 -C build/portrom/images/config/"$i"_fs_config -S build/portrom/images/config/"$i"_file_contexts -f build/portrom/images/$i -a /$i build/portrom/images/$i.img || false
