@@ -299,9 +299,12 @@ port_device_code=$(echo $port_mios_version_incremental | cut -d "." -f 5)
 
 if [[ $port_mios_version_incremental == *DEV* ]] || [[ ${portrom_type} == "fastboot" ]];then
     yellow "检测到开发板，跳过修改版本代码" "Dev deteced,skip replacing codename"
-    port_rom_version=$(echo $port_mios_version_incremental)
-else
+    port_rom_version="$(echo $port_mios_version_incremental)"
+elif [[ $port_android_version == "14" ]];then
     base_device_code=U$(echo $base_rom_version | cut -d "." -f 5 | cut -c 2-)
+    port_rom_version=$(echo $port_mios_version_incremental | sed "s/$port_device_code/$base_device_code/")
+elif [[ $port_android_version == "15" ]];then
+    base_device_code=V$(echo $base_rom_version | cut -d "." -f 5 | cut -c 2-)
     port_rom_version=$(echo $port_mios_version_incremental | sed "s/$port_device_code/$base_device_code/")
 fi
 green "ROM 版本: 底包为 [${base_rom_version}], 移植包为 [${port_rom_version}]" "ROM Version: BASEROM: [${base_rom_version}], PORTROM: [${port_rom_version}] "
@@ -480,7 +483,15 @@ if [[ -f $targetAospFrameworkResOverlay ]]; then
         # magic: Change DefaultPeakRefrshRate to 60 
         xmlstarlet ed -L -u "//integer[@name='config_defaultPeakRefreshRate']/text()" -v 60 $xml
     done
-    bin/apktool/apktool b tmp/$targetDir -o tmp/$filename > /dev/null 2>&1 || error "apktool 打包失败" "apktool mod failed"
+    if [[ $port_android_version == "15" ]]; then
+        blue "Fix VanillaIceCream brightness" 
+        for xml in $(find tmp/$targetDir -type f -name "*.xml");do
+            sed -i "s/config_screenBrightnessSettingDefault/config_screenBrightnessSettingDefault_hyper/g" $xml
+            sed -i "s/config_screenBrightnessSettingMaximum/config_screenBrightnessSettingMaximum_hyper/g" $xml
+            sed -i "s/config_screenBrightnessSettingMinimum/config_screenBrightnessSettingMinimum_hyper/g" $xml 
+        done 
+    fi
+    bin/apktool/apktool b tmp/$targetDir -o tmp/$filename || error "apktool 打包失败" "apktool mod failed"
     cp -rf tmp/$filename $targetAospFrameworkResOverlay
 fi
 
@@ -546,9 +557,12 @@ else
     blue "File $targetVintf not found."
 fi
 
-
-
-if [[ ${port_rom_code} != "sheng" ]] || [[ ${port_rom_code} != "shennong" ]];then
+if  [[ ${port_android_version} == "15" ]];then
+    blue "Skip StrongToast UI fix"
+elif [[ ${port_rom_code} == "houji" ]] || [[ ${port_rom_code} == "shennong" ]] ;then
+    blue "左侧挖孔灵动岛修复" "StrongToast UI fix"
+    patch_smali "MiuiSystemUI.apk" "MIUIStrongToast\$2.smali" "const\/4 v7\, 0x0" "iget-object v7\, v1\, Lcom\/android\/systemui\/toast\/MIUIStrongToast;->mRLLeft:Landroid\/widget\/RelativeLayout;\\n\\tinvoke-virtual {v7}, Landroid\/widget\/RelativeLayout;->getLeft()I\\n\\tmove-result v7\\n\\tint-to-float v7,v7"
+else
 blue "左侧挖孔灵动岛修复" "StrongToast UI fix"
     patch_smali "MiuiSystemUI.apk" "MIUIStrongToast\$2.smali" "const\/4 v9\, 0x0" "iget-object v9\, v1\, Lcom\/android\/systemui\/toast\/MIUIStrongToast;->mRLLeft:Landroid\/widget\/RelativeLayout;\\n\\tinvoke-virtual {v9}, Landroid\/widget\/RelativeLayout;->getLeft()I\\n\\tmove-result v9\\n\\tint-to-float v9,v9"
 fi
@@ -560,9 +574,9 @@ fi
 
 if [[ ${is_eu_rom} == "true" ]];then
     patch_smali "miui-services.jar" "SystemServerImpl.smali" ".method public constructor <init>()V/,/.end method" ".method public constructor <init>()V\n\t.registers 1\n\tinvoke-direct {p0}, Lcom\/android\/server\/SystemServerStub;-><init>()V\n\n\treturn-void\n.end method" "regex"
-
-elif [[ ${port_rom_code} != "sheng" ]] || [[ ${port_rom_code} != "shennong" ]];then
-    
+elif [[ ${port_android_version} == "15" ]];then
+    blue "Skip Signature Verfier fix"
+else 
     if [[ ! -d tmp ]];then
         mkdir -p tmp/
     fi
@@ -810,12 +824,15 @@ fi
 
 unlock_device_feature "whether support fps change " "bool" "support_smart_fps"
 unlock_device_feature "smart fps value" "integer" "smart_fps_value" "${maxFps}"
+if [[ ${port_android_version} != "15" ]];then
 patch_smali "PowerKeeper.apk" "DisplayFrameSetting.smali" "unicorn" "umi"
+fi
 if [[ ${is_eu_rom} == true ]];then
     patch_smali "MiSettings.apk" "NewRefreshRateFragment.smali" "const-string v1, \"btn_preferce_category\"" "const-string v1, \"btn_preferce_category\"\n\n\tconst\/16 p1, 0x1"
-
 else
+    if [[ ${port_android_version} != "15" ]];then
     patch_smali "MISettings.apk" "NewRefreshRateFragment.smali" "const-string v1, \"btn_preferce_category\"" "const-string v1, \"btn_preferce_category\"\n\n\tconst\/16 p1, 0x1"
+fi
 fi
 # Unlock eyecare mode 
 unlock_device_feature "default rhythmic eyecare mode" "integer" "default_eyecare_mode" "2"
@@ -823,7 +840,7 @@ unlock_device_feature "default texture for paper eyecare" "integer" "paper_eyeca
 
 # Unlock Celluar Sharing feature
     targetFrameworkExtRes=$(find build/portrom/images/system_ext -type f -name "framework-ext-res.apk")
-if [[ -f $targetFrameworkExtRes ]]; then
+if [[ -f $targetFrameworkExtRes ]] && [[ ${port_android_version} != "15" ]]; then
     mkdir tmp/  > /dev/null 2>&1
     
     java -jar bin/apktool/APKEditor.jar d -i $targetFrameworkExtRes -o tmp/framework-ext-res -f > /dev/null 2>&1
@@ -973,6 +990,11 @@ if [[ -d "devices/common" ]];then
         unzip -oq devices/common/nfc_a14.zip -d build/portrom/images/
         echo "ro.vendor.nfc.dispatch_optim=1" >> build/portrom/images/vendor/build.prop
     fi
+    if [[ $base_device_code == "munch" ]] && [[ ${port_android_version} == "15" ]]; then
+        sourceCamera=$(find build/baserom/images/ -type f -name "MiuiCamera.apk")
+        targetCamera=$(find build/portrom/images/ -type d -name "MiuiCamera")
+        cp -rfv $sourceCamera $targetCamera/
+    else
     
     if [[ $base_android_version == "13" ]] && [[ -f $commonCamera ]];then
         yellow "替换相机为10S HyperOS A13 相机，MI10可用, thanks to 酷安 @PedroZ" "Replacing a compatible MiuiCamera.apk verson 4.5.003000.2"
