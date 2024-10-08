@@ -80,10 +80,10 @@ else
     exit
 fi
 
-if [ "$(echo $baserom |grep miui_)" != "" ];then
-    device_code=$(basename $baserom |cut -d '_' -f 2)
-elif [ "$(echo $baserom |grep xiaomi.eu_)" != "" ];then
+if [ "$(echo $baserom |grep _multi_)" != "" ];then
     device_code=$(basename $baserom |cut -d '_' -f 3)
+elif [ "$(echo $baserom |grep miui_)" != "" ] || [ "$(echo $baserom |grep xiaomi.eu_)" != "" ];then
+    device_code=$(basename $baserom |cut -d '_' -f 2)
 else
     device_code="YourDevice"
 fi
@@ -145,7 +145,7 @@ sudo rm -rf config
 sudo rm -rf build/baserom/
 sudo rm -rf build/portrom/
 find . -type d -name 'hyperos_*' |xargs rm -rf
-
+find . -type d -name 'xiaomi.eu_*' |xargs rm -rf
 green "文件清理完毕" "Files cleaned up."
 mkdir -p build/baserom/images/
 
