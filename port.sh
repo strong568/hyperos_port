@@ -868,6 +868,9 @@ fi
 echo "debug.game.video.speed=true" >> build/portrom/images/product/etc/build.prop
 echo "debug.game.video.support=true" >> build/portrom/images/product/etc/build.prop
 
+# Enable Xiaomi extm dm_opt feature
+echo "persist.miui.extm.dm_opt.enable=true" >> build/portrom/images/product/etc/build.prop
+
 # Unlock Smart fps
 
 maxFps=$(xmlstarlet sel -t -v "//integer-array[@name='fpsList']/item" build/portrom/images/product/etc/device_features/${base_rom_code}.xml | sort -nr | head -n 1)
