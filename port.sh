@@ -332,7 +332,7 @@ fi
 
 baseMiuiFrameworkResOverlay=$(find build/baserom/images/product -type f -name "MiuiFrameworkResOverlay.apk")
 portMiuiFrameworkResOverlay=$(find build/portrom/images/product -type f -name "MiuiFrameworkResOverlay.apk")
-if [ -f ${baseMiuiFrameworkResOverlay} ] && [ -f ${portMiuiFrameworkResOverlay} ];then
+if [ -f "${baseMiuiFrameworkResOverlay}" ] && [ -f "${portMiuiFrameworkResOverlay}" ];then
     blue "正在替换 [MiuiFrameworkResOverlay.apk]" "Replacing [MiuiFrameworkResOverlay.apk]" 
     cp -rf ${baseMiuiFrameworkResOverlay} ${portMiuiFrameworkResOverlay}
 fi
@@ -420,7 +420,7 @@ if [[ ${is_eu_rom} == "true" ]];then
 fi
 baseMiSound=$(find build/baserom/images/product -type d -name "MiSound")
 portMiSound=$(find build/portrom/images/product -type d -name "MiSound")
-if [ -d ${baseMiSound} ] && [ -d ${portMiSound} ];then
+if [ -d "${baseMiSound}" ] && [ -d "${portMiSound}" ];then
    blue "正在替换 MiSound" "Replacing stock MiSound"
    rm -rf ./${portMiSound}/*
    cp -rf ./${baseMiSound}/* ${portMiSound}/
@@ -451,7 +451,7 @@ fi
 
 # 修复AOD问题
 targetDevicesAndroidOverlay=$(find build/portrom/images/product -type f -name "DevicesAndroidOverlay.apk")
-if [[ -f $targetDevicesAndroidOverlay ]]; then
+if [[ -f "${targetDevicesAndroidOverlay}" ]]; then
     mkdir tmp/  
     filename=$(basename $targetDevicesAndroidOverlay)
     yellow "修复息屏和屏下指纹问题" "Fixing AOD issue: $filename ..."
@@ -470,7 +470,7 @@ fi
 # Fix boot up frame drop issue. 
 targetAospFrameworkResOverlay=$(find build/portrom/images/product -type f -name "AospFrameworkResOverlay.apk")
 
-if [[ -f $targetAospFrameworkResOverlay ]]; then
+if [[ -f "${targetAospFrameworkResOverlay}" ]]; then
     
     if [[ ! -d tmp ]]; then
      mkdir tmp
@@ -499,25 +499,13 @@ fi
 
 sourceMiuiFrameworkTelephonyResOverlay=$(find build/baserom/images/product -type f -name "MiuiFrameworkTelephonyResOverlay.apk")
 targetMiuiFrameworkTelephonyResOverlay=$(find build/portrom/images/product -type f -name "MiuiFrameworkTelephonyResOverlay.apk")
-if [[ ! -f $sourceMiuiFrameworkTelephonyResOverlay ]]; then
-    
-    if [[ ! -d tmp ]]; then
-     mkdir tmp
-    fi
-    filename=$(basename $targetMiuiFrameworkTelephonyResOverlay)
-    targetDir=$(echo "$filename" | sed 's/\..*$//')
-   bin/apktool/apktool d $targetMiuiFrameworkTelephonyResOverlay -o tmp/$targetDir -f > /dev/null 2>&1
-    if [[ $port_android_version == "15" ]]; then
-        for xml in $(find tmp/$targetDir -type f -name "*.xml");do
-            sed -i 's|<bool name="config_roaming_optimization_supported">true</bool>|<bool name="config_roaming_optimization_supported">false</bool>|g' "$xml"
-        done 
-    fi
-    bin/apktool/apktool b tmp/$targetDir -o tmp/$filename > /dev/null 2>&1 || error "apktool 打包失败" "apktool mod failed"
-    cp -rf tmp/$filename $targetMiuiFrameworkTelephonyResOverlay
-else
-    cp -rf $sourceMiuiFrameworkTelephonyResOverlay $targetMiuiFrameworkTelephonyResOverlay
+if [ -f "${sourceMiuiFrameworkTelephonyResOverlay}" ] && [ -f "${targetMiuiFrameworkTelephonyResOverlay}" ];then
+    cp -rfv $sourceMiuiFrameworkTelephonyResOverlay $targetMiuiFrameworkTelephonyResOverlay
+elif [ -f "${sourceMiuiFrameworkTelephonyResOverlay}" ] && [ ! -f "${targetMiuiFrameworkTelephonyResOverlay}" ];then
+    cp -rfv $sourceMiuiFrameworkTelephonyResOverlay build/portrom/images/product/overlay/
+elif [ ! -f "{$sourceMiuiFrameworkTelephonyResOverlay}" ] && [ -f "${targetMiuiFrameworkTelephonyResOverlay}" ];then
+    rm -rfv $targetMiuiFrameworkTelephonyResOverlay
 fi
-
 
 #其他机型可能没有default.prop
 for prop_file in $(find build/portrom/images/vendor/ -name "*.prop"); do
@@ -896,7 +884,7 @@ unlock_device_feature "default texture for paper eyecare" "integer" "paper_eyeca
 
 # Unlock Celluar Sharing feature
     targetFrameworkExtRes=$(find build/portrom/images/system_ext -type f -name "framework-ext-res.apk")
-if [[ -f $targetFrameworkExtRes ]] && [[ ${port_android_version} != "15" ]]; then
+if [[ -f "${targetFrameworkExtRes}" ]] && [[ ${port_android_version} != "15" ]]; then
     mkdir tmp/  > /dev/null 2>&1 
     java -jar bin/apktool/APKEditor.jar d -i $targetFrameworkExtRes -o tmp/framework-ext-res -f > /dev/null 2>&1
     if grep -r config_celluar_shared_support tmp/framework-ext-res/ ; then  
@@ -915,7 +903,7 @@ if [[ -f $targetFrameworkExtRes ]] && [[ ${port_android_version} != "15" ]]; the
 fi
 
 targetMiLinkOS2APK=$(find build/portrom -type f -name "MiLinkOS2CN.apk")
-if [[ -f $targetMiLinkOS2APK ]];then
+if [[ -f "${targetMiLinkOS2APK}" ]];then
     cp -rf $targetMiLinkOS2APK tmp/$(basename $targetMiLinkOS2APK).bak
     java -jar bin/apktool/APKEditor.jar d -i $targetMiLinkOS2APK -o tmp/MiLinkOS2 -f > /dev/null 2>&1
     targetsmali=$(find tmp/MiLinkOS2 -name "HMindManager.smali")
@@ -926,7 +914,7 @@ if [[ -f $targetMiLinkOS2APK ]];then
 fi
 
 targetMIUIThemeManagerAPK=$(find build/portrom -type f -name "MIUIThemeManager.apk")
-if [[ -f $targetMIUIThemeManagerAPK ]];then
+if [[ -f "${targetMIUIThemeManagerAPK}" ]];then
     cp -rf $targetMIUIThemeManagerAPK tmp/$(basename $targetMIUIThemeManagerAPK).bak
     java -jar bin/apktool/APKEditor.jar d -i $targetMIUIThemeManagerAPK -o tmp/MIUIThemeManager -f > /dev/null 2>&1
     targetsmali=$(find tmp/ -name "o1t.smali" -path "*/basemodule/utils/*")
@@ -936,7 +924,7 @@ if [[ -f $targetMIUIThemeManagerAPK ]];then
 fi
 
 targetSettingsAPK=$(find build/portrom -type f -name "Settings.apk")
-if [[ -f $targetSettingsAPK ]];then
+if [[ -f "${targetSettingsAPK}" ]];then
     cp -rf $targetSettingsAPK tmp/$(basename $targetSettingsAPK).bak
     java -jar bin/apktool/APKEditor.jar d -i $targetSettingsAPK -o tmp/Settings -f > /dev/null 2>&1
     targetsmali=$(find tmp/ -type f -path "*/com/android/settings/InternalDeviceUtils.smali")
@@ -996,7 +984,7 @@ if [[ ${port_rom_code} == "dagu_cn" ]] || [[ ${port_rom_code} == "sheng" ]];then
     rm -rf build/portrom/images/product/overlay/SettingsRroDeviceSystemUiOverlay.apk
 
     targetAospFrameworkTelephonyResOverlay=$(find build/portrom/images/product -type f -name "AospFrameworkTelephonyResOverlay.apk")
-    if [[ -f $targetAospFrameworkTelephonyResOverlay ]]; then
+    if [[ -f "${targetAospFrameworkTelephonyResOverlay}" ]]; then
         mkdir tmp/  
         filename=$(basename $targetAospFrameworkTelephonyResOverlay)
         yellow "Enable Phone Call and SMS feature in Pad port."
@@ -1017,7 +1005,7 @@ if [[ ${port_rom_code} == "dagu_cn" ]] || [[ ${port_rom_code} == "sheng" ]];then
             
             sourceApkFolder=$(find devices/pad/overlay/product/priv-app -type d -name *"$app"* )
             targetApkFolder=$(find build/portrom/images/product/priv-app -type d -name *"$app"* )
-            if  [[ -d $targetApkFolder ]];then
+            if  [[ -d "${targetApkFolder}" ]];then
                     rm -rfv $targetApkFolder
                     cp -rf $sourceApkFolder build/portrom/images/product/priv-app
             else
@@ -1030,7 +1018,7 @@ if [[ ${port_rom_code} == "dagu_cn" ]] || [[ ${port_rom_code} == "sheng" ]];then
     if [[ -d devices/pad/overlay/product/app ]];then
         for app in $(ls devices/pad/overlay/product/app); do
             targetAppfolder=$(find build/portrom/images/product/app -type d -name *"$app"* )
-            if [ -d $targetAppfolder ]; then
+            if [ -d "${targetAppfolder}" ]; then
                 rm -rfv $targetAppfolder
             fi
             cp -rf devices/pad/overlay/product/app/$app build/portrom/images/product/app/
@@ -1040,7 +1028,7 @@ if [[ ${port_rom_code} == "dagu_cn" ]] || [[ ${port_rom_code} == "sheng" ]];then
     if [[ -d devices/pad/overlay/product/data-app ]];then
         for app in $(ls devices/pad/overlay/product/data-app); do
             targetAppfolder=$(find build/portrom/images/product/data-app -type d -name *"$app"* )
-            if [ -d $targetAppfolder ]; then
+            if [ -d "${targetAppfolder}" ]; then
                 rm -rfv $targetAppfolder
             fi
             cp -rf devices/pad/overlay/product/data-app/$app build/portrom/images/product/data-app/
@@ -1068,7 +1056,7 @@ if [[ -d "devices/common" ]];then
 
     
     if [[ $nfc_fix_type == "legacy" ]];then
-        if [[ -d $targetNQNfcNci ]];then
+        if [[ -d "${targetNQNfcNci}" ]];then
         rm -rf $targetNQNfcNci
         fi
         find build/portrom/images/ -name "com.nxp.nfc.nq.jar" -type f -delete
@@ -1087,9 +1075,9 @@ if [[ -d "devices/common" ]];then
         cp -rf $sourceCamera $targetCamera/
     else
     
-    if [[ $base_android_version == "13" ]] && [[ -f $commonCamera ]];then
+    if [[ ${base_android_version} == "13" ]] && [[ -f "${commonCamera}" ]];then
         yellow "替换相机为10S HyperOS A13 相机，MI10可用, thanks to 酷安 @PedroZ" "Replacing a compatible MiuiCamera.apk verson 4.5.003000.2"
-        if [[ -d $targetCamera ]];then
+        if [[ -d "${targetCamera}" ]];then
             rm -rf $targetCamera/*
         fi
         cp -rf $commonCamera $targetCamera
@@ -1366,7 +1354,7 @@ if [[ $pack_method == "aosp" ]];then
 
         } >> out/target/product/${base_rom_code}/META/misc_info.txt
         recovery_file=$(find build/portrom/ -name "recovery-from-boot.p")
-        if [[ -f $recovery_file ]];then
+        if [[ -f "${recovery_file}" ]];then
             cp -rfv $recovery_file out/target/product/${base_rom_code}/VENDOR/
         fi
         mkdir -p out/target/product/${base_rom_code}/OTA/bin
@@ -1592,7 +1580,7 @@ else
     ksu_bootimg_file=$(find devices/$base_rom_code/ -type f -name "*boot_ksu.img")
     nonksu_bootimg_file=$(find devices/$base_rom_code/ -type f -name "*boot_noksu.img")
     custom_bootimg_file=$(find devices/$base_rom_code/ -type f -name "*boot_custom.img")
-    if [[ -f $nonksu_bootimg_file ]];then
+    if [[ -f "${nonksu_bootimg_file}" ]];then
         nonksubootimg=$(basename "$nonksu_bootimg_file")
         mv -f $nonksu_bootimg_file out/${os_type}_${device_code}_${port_rom_version}/
         mv -f  devices/$base_rom_code/dtbo_noksu.img out/${os_type}_${device_code}_${port_rom_version}/firmware-update/dtbo_noksu.img
@@ -1604,7 +1592,7 @@ else
         sed -i "s/dtbo.img/dtbo_noksu.img/g" out/${os_type}_${device_code}_${port_rom_version}/mac_linux_flash_script.sh
     else
             bootimg=$(find out/${os_type}_${device_code}_${port_rom_version} build/baserom/ -name "boot.img" | head -n 1)
-            if [ ! -f $bootimg ];then
+            if [ ! -f "${bootimg}" ];then
                 bootimg=$(find build/baserom/ -name "boot.img")
             fi
     mv -f $bootimg out/${os_type}_${device_code}_${port_rom_version}/boot_official.img
