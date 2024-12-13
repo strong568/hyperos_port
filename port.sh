@@ -372,38 +372,6 @@ if [ -f "${baseMiuiBiometricResOverlay}" ] && [ -f "${portMiuiBiometricResOverla
     cp -rf ${baseMiuiBiometricResOverlay} ${portMiuiBiometricResOverlay}
 fi
 
-# radio lib
-# blue "信号相关"
-# for radiolib in $(find build/baserom/images/system/system/lib/ -maxdepth 1 -type f -name "*radio*");do
-#     cp -rf $radiolib build/portrom/images/system/system/lib/
-# done
-
-# for radiolib in $(find build/baserom/images/system/system/lib64/ -maxdepth 1 -type f -name "*radio*");do
-#     cp -rf $radiolib build/portrom/images/system/system/lib64/
-# done
-
-
-# audio lib
-# blue "音频相关"
-# for audiolib in $(find build/baserom/images/system/system/lib/ -maxdepth 1 -type f -name "*audio*");do
-#     cp -rf $audiolib build/portrom/images/system/system/lib/
-# done
-
-# for audiolib in $(find build/baserom/images/system/system/lib64/ -maxdepth 1 -type f -name "*audio*");do
-#     cp -rf $audiolib build/portrom/images/system/system/lib64/
-# done
-
-# # bt lib
-# blue "蓝牙相关"
-# for btlib in $(find build/baserom/images/system/system/lib/ -maxdepth 1 -type f -name "*bluetooth*");do
-#     cp -rf $btlib build/portrom/images/system/system/lib/
-# done
-
-# for btlib in $(find build/baserom/images/system/system/lib64/ -maxdepth 1 -type f -name "*bluetooth*");do
-#     cp -rf $btlib build/portrom/images/system/system/lib64/
-# done
-
-
 # displayconfig id
 rm -rf build/portrom/images/product/etc/displayconfig/display_id*.xml
 cp -rf build/baserom/images/product/etc/displayconfig/display_id*.xml build/portrom/images/product/etc/displayconfig/
@@ -425,15 +393,6 @@ if [ -d "${baseMiSound}" ] && [ -d "${portMiSound}" ];then
    rm -rf ./${portMiSound}/*
    cp -rf ./${baseMiSound}/* ${portMiSound}/
 fi
-
-# MusicFX
-#baseMusicFX=$(find build/baserom/images/product build/baserom/images/system -type d -name "MusicFX")
-#portMusicFX=$(find build/baserom/images/product build/baserom/images/system -type d -name "MusicFX")
-#if [ -d ${baseMusicFX} ] && [ -d ${portMusicFX} ];then
-#    blue "正在替换 MusicFX"
-##    rm -rf ./${portMusicFX}/*
- #   cp -rf ./${baseMusicFX}/* ${portMusicFX}/
-#fi
 
 # 人脸
 baseMiuiBiometric=$(find build/baserom/images/product/app -type d -name "*Biometric*")
@@ -591,15 +550,8 @@ blue "左侧挖孔灵动岛修复" "StrongToast UI fix"
     patch_smali "MiuiSystemUI.apk" "MIUIStrongToast\$2.smali" "const\/4 v9\, 0x0" "iget-object v9\, v1\, Lcom\/android\/systemui\/toast\/MIUIStrongToast;->mRLLeft:Landroid\/widget\/RelativeLayout;\\n\\tinvoke-virtual {v9}, Landroid\/widget\/RelativeLayout;->getLeft()I\\n\\tmove-result v9\\n\\tint-to-float v9,v9"
 fi
 
-
-
-#blue "解除状态栏通知个数限制(默认最大6个)" "Set SystemUI maxStaticIcons to 6 by default."
-#patch_smali "MiuiSystemUI.apk" "NotificationIconAreaController.smali" "iput p10, p0, Lcom\/android\/systemui\/statusbar\/phone\/NotificationIconContainer;->mMaxStaticIcons:I" "const\/4 p10, 0x6\n\n\tiput p10, p0, Lcom\/android\/systemui\/statusbar\/phone\/NotificationIconContainer;->mMaxStaticIcons:I"
-
 if [[ ${is_eu_rom} == "true" ]];then
     patch_smali "miui-services.jar" "SystemServerImpl.smali" ".method public constructor <init>()V/,/.end method" ".method public constructor <init>()V\n\t.registers 1\n\tinvoke-direct {p0}, Lcom\/android\/server\/SystemServerStub;-><init>()V\n\n\treturn-void\n.end method" "regex"
-elif [[ ${port_android_version} == "15" ]];then
-   blue "Skip Signature Verfier fix"
 else 
     if [[ ! -d tmp ]];then
         mkdir -p tmp/
@@ -667,20 +619,6 @@ if [[ ${is_eu_rom} == true ]];then
             cp -rf ${baseXGoogle} build/portrom/images/product/priv-app/
         fi
     fi
-
-    #baseOKGoogle=$(find build/baserom/images/product/ -type d -name "HotwordEnrollmentOKGoogleHEXAGON*")
-    #portOKGoogle=$(find build/portrom/images/product/ -type d -name "HotwordEnrollmentOKGoogleHEXAGON*")
-    #if [ -d "${baseOKGoogle}" ] && [ -d "${portOKGoogle}" ];then
-    #    yellow "查找并替换HotwordEnrollmentOKGoogleHEXAGON_WIDEBAND.apk" "Searching and Replacing HotwordEnrollmentOKGoogleHEXAGON_WIDEBAND.apk.."
-    #    rm -rf ./${portOKGoogle}/*
-    #    cp -rf ./${baseOKGoogle}/* ${portOKGoogle}/
-    #else
-    #    if [ -d "${baseOKGoogle}" ] && [ ! -d "${portOKGoogle}" ];then
-    #        blue "未找到HotwordEnrollmentOKGoogleHEXAGON_WIDEBAND.apk，替换为原包" "HotwordEnrollmentOKGoogleHEXAGON_WIDEBAND.apk is missing, copying from base..."
-    #        cp -rf ${baseOKGoogle} build/portrom/images/product/priv-app/
-    #    fi
-    #fi
-
 else
     yellow "删除多余的App" "Debloating..." 
     # List of apps to be removed
@@ -942,12 +880,6 @@ if [[ ${port_rom_code} == "munch_cn" ]];then
 
 fi
 
-if [[ ${port_rom_code} == "sheng" ]];then
-    for perm in build/portrom/images/vendor/etc/permissions/android.hardware.telephony.cdma.xml build/portrom/images/vendor/etc/permissions/android.hardware.telephony.gsm.xml;do
-        sed -i 's|<feature name="android.hardware.telephony" />|<feature name="android.hardware.telephony" />\n\t<feature name="android.software.telecom" />\n\t<feature name="android.hardware.telephony.radio.access" />\n\t<feature name="android.hardware.telephony.subscription" />\n\t<feature name="android.hardware.telephony.calling" />\n\t<feature name="android.hardware.telephony.data" />\n\t<feature name="android.hardware.telephony.messaging" />|' ${perm}
-    done
-fi
-
 #自定义替换
 
 #Add perfect icons
@@ -980,73 +912,6 @@ if ! is_property_exists ro.miui.surfaceflinger_affinity build/portrom/images/pro
 fi
 
 #自定义替换
-if [[ ${port_rom_code} == "dagu_cn" ]] || [[ ${port_rom_code} == "sheng" ]];then
-    echo "ro.control_privapp_permissions=log" >> build/portrom/images/product/etc/build.prop
-    
-    rm -rf build/portrom/images/product/overlay/MiuiSystemUIResOverlay.apk
-    rm -rf build/portrom/images/product/overlay/SettingsRroDeviceSystemUiOverlay.apk
-
-    targetAospFrameworkTelephonyResOverlay=$(find build/portrom/images/product -type f -name "AospFrameworkTelephonyResOverlay.apk")
-    if [[ -f "${targetAospFrameworkTelephonyResOverlay}" ]]; then
-        mkdir tmp/  
-        filename=$(basename $targetAospFrameworkTelephonyResOverlay)
-        yellow "Enable Phone Call and SMS feature in Pad port."
-        targetDir=$(echo "$filename" | sed 's/\..*$//')
-        bin/apktool/apktool d $targetAospFrameworkTelephonyResOverlay -o tmp/$targetDir -f > /dev/null 2>&1
-        for xml in $(find tmp/$targetDir -type f -name "*.xml");do
-            sed -i 's|<bool name="config_sms_capable">false</bool>|<bool name="config_sms_capable">true</bool>|' $xml
-            sed -i 's|<bool name="config_voice_capable">false</bool>|<bool name="config_voice_capable">true</bool>|' $xml
-        done
-        bin/apktool/apktool b tmp/$targetDir -o tmp/$filename > /dev/null 2>&1 || error "apktool 打包失败" "apktool mod failed"
-        cp -rf tmp/$filename $targetAospFrameworkTelephonyResOverlay
-        #rm -rf tmp
-    fi
-    blue "Replace Pad Software"
-    if [[ -d devices/pad/overlay/product/priv-app ]];then
-
-        for app in $(ls devices/pad/overlay/product/priv-app); do
-            
-            sourceApkFolder=$(find devices/pad/overlay/product/priv-app -type d -name *"$app"* )
-            targetApkFolder=$(find build/portrom/images/product/priv-app -type d -name *"$app"* )
-            if  [[ -d "${targetApkFolder}" ]];then
-                    rm -rfv $targetApkFolder
-                    cp -rf $sourceApkFolder build/portrom/images/product/priv-app
-            else
-                cp -rf $sourceApkFolder build/portrom/images/product/priv-app
-            fi
-
-        done
-    fi
-
-    if [[ -d devices/pad/overlay/product/app ]];then
-        for app in $(ls devices/pad/overlay/product/app); do
-            targetAppfolder=$(find build/portrom/images/product/app -type d -name *"$app"* )
-            if [ -d "${targetAppfolder}" ]; then
-                rm -rfv $targetAppfolder
-            fi
-            cp -rf devices/pad/overlay/product/app/$app build/portrom/images/product/app/
-        done
-    fi
-
-    if [[ -d devices/pad/overlay/product/data-app ]];then
-        for app in $(ls devices/pad/overlay/product/data-app); do
-            targetAppfolder=$(find build/portrom/images/product/data-app -type d -name *"$app"* )
-            if [ -d "${targetAppfolder}" ]; then
-                rm -rfv $targetAppfolder
-            fi
-            cp -rf devices/pad/overlay/product/data-app/$app build/portrom/images/product/data-app/
-        done
-    fi
-
-    if [[ -d devices/pad/overlay/system_ext ]]; then
-        cp -rf devices/pad/overlay/system_ext/* build/portrom/images/system_ext/
-    fi
-
-    blue "Add permissions" 
-    sed -i 's|</permissions>|\t<privapp-permissions package="com.android.mms"> \n\t\t<permission name="android.permission.WRITE_APN_SETTINGS" />\n\t\t<permission name="android.permission.START_ACTIVITIES_FROM_BACKGROUND" />\n\t\t<permission name="android.permission.READ_PRIVILEGED_PHONE_STATE" />\n\t\t<permission name="android.permission.CALL_PRIVILEGED" /> \n\t\t<permission name="android.permission.GET_ACCOUNTS_PRIVILEGED" /> \n\t\t<permission name="android.permission.WRITE_SECURE_SETTINGS" />\n\t\t<permission name="android.permission.SEND_SMS_NO_CONFIRMATION" /> \n\t\t<permission name="android.permission.SEND_RESPOND_VIA_MESSAGE" />\n\t\t<permission name="android.permission.UPDATE_APP_OPS_STATS" />\n\t\t<permission name="android.permission.MODIFY_PHONE_STATE" /> \n\t\t<permission name="android.permission.WRITE_MEDIA_STORAGE" /> \n\t\t<permission name="android.permission.MANAGE_USERS" /> \n\t\t<permission name="android.permission.INTERACT_ACROSS_USERS" />\n\t\t <permission name="android.permission.SCHEDULE_EXACT_ALARM" /> \n\t</privapp-permissions>\n</permissions>|'  build/portrom/images/product/etc/permissions/privapp-permissions-product.xml
-    sed -i 's|</permissions>|\t<privapp-permissions package="com.miui.contentextension">\n\t\t<permission name="android.permission.WRITE_SECURE_SETTINGS" />\n\t</privapp-permissions>\n</permissions>|' build/portrom/images/product/etc/permissions/privapp-permissions-product.xml
-
-fi
 
 sourceAnimationZIP=$(find build/baserom/images/product -type f -name "bootanimation.zip")
 targetAnimationZIP=$(find build/portrom/images/product -type f -name "bootanimation.zip")
