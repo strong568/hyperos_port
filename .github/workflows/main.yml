@@ -15,7 +15,7 @@ on:
         default: EROFS
         required: false
       ENCRYPTION:
-        description: "是否解密data分区(TRUE/FALSE)，默认加密 | FBE DECRYPTION OR NOT, FBE ENABLED BY DEFAULT"
+        description: "是否解密data分区(TRUE/FALSE)，默认加密 | FBE DECRYPTION OR NOT, data encryption BY DEFAULT"
         default: FALSE
         required: false
 
