@@ -88,6 +88,29 @@ else
 fi
 
 blue "正在检测ROM底包" "Validating BASEROM.."
+case "${baserom}" in
+    *.zip)
+        if unzip -l "${baserom}" | grep -q "payload.bin"; then
+            green "检测到payload.bin文件" "Found payload.bin file"
+        elif [[ "${baserom}" == *"xiaomi.eu"* ]] && (unzip -l ${baserom} | grep -q "images/super.img*") ; then
+            green "检测到super.img.*文件" "Found super.img.* files"
+    is_base_rom_eu=true
+else
+            error "底包中未发现payload.bin以及br文件，请使用MIUI官方包后重试" "payload.bin/new.br/super.img* not found, please use HyperOS official OTA zip package."
+            exit
+        fi
+        ;;
+    *.tgz)
+        # FIXME: Checking if the .tgz contains super.img is very time-consuming, so just skip it here for now.
+        green "跳过检查tgz" "Skip validating tgz file"
+        portrom_type="fastboot"
+        ;;
+    *)
+        error "目标移植包不是有效的ZIP或TGZ文件，请检查文件格式。" "The target package is not a valid ZIP or TGZ file, please check the file format."
+        ;;
+esac
+            
+blue "正在检测ROM底包" "Validating BASEROM.."
 if unzip -l ${baserom} | grep -q "payload.bin"; then
     baserom_type="payload"
     green "检测到payload.bin文件" "Found payload.bin file"
@@ -99,8 +122,8 @@ elif unzip -l ${baserom} | grep -q "images/super.img*"; then
     green "检测到super.img.*文件" "Found super.img.* files"
     is_base_rom_eu=true
 else
-    error "底包中未发现payload.bin以及br文件，请使用MIUI官方包后重试" "payload.bin/new.br not found, please use HyperOS official OTA zip package."
-    exit
+    error "底包中未发现payload.bin以及br文件，请使用MIUI官方包后重试" "payload.bin/new.br/super.img* not found, please use HyperOS official OTA zip package."
+    #exit
 fi
 
 blue "开始检测ROM移植包" "Validating PORTROM.."
