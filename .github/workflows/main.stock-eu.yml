@@ -9,7 +9,8 @@ on:
       PORT_URL:
         description: "待操作的移植包下载地址 | PORTROM DIRECT DOWNLOAD LINK(XIAOMI.EU OR CN OFFICIAL ROM)"
         required: true
-        default: 'https://sourceforge.net/projects/xiaomi-eu-multilang-miui-roms/files/xiaomi.eu/HyperOS-STABLE-RELEASES/HyperOS2.0/xiaomi.eu_AURORA_OS2.0.13.0.VNACNXM_15.zip'
+        default: 'https://bn.d.miui.com/OS2.0.13.0.VNACNXM/aurora-ota_full-OS2.0.13.0.VNACNXM-user-15.0-cc9c5b9dc1.zip'
+        #default: 'https://sourceforge.net/projects/xiaomi-eu-multilang-miui-roms/files/xiaomi.eu/HyperOS-STABLE-RELEASES/HyperOS2.0/xiaomi.eu_AURORA_OS2.0.13.0.VNACNXM_15.zip'
       PACK_TYPE:
         description: "打包类型（EXT/EROFS) | PACKING TYPE(EXT/EROFS), EROFS BY DEFAULT"
         default: EROFS
@@ -21,7 +22,11 @@ on:
       ENCRYPTION:
         description: "是否解密data分区(TRUE/FALSE)，默认加密 | FBE DECRYPTION OR NOT, data encryption BY DEFAULT"
         default: FALSE
-        required: false
+        type: choice
+        options:
+        - TRUE
+        - FALSE
+        required: true
 
 jobs:
   build:
