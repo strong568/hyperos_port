@@ -128,10 +128,10 @@ esac
 
 green "ROM初步检测通过" "ROM validation passed."
 
-if [[ "$portrom" =~ SHENNONG|HOUJI ]]; then
-    is_shennong_houji_port=true
+if [[ "$portrom" =~ AURORA|SHENNONG|HOUJI ]]; then
+    is_aurora_shennong_houji_port=true
 else
-    is_shennong_houji_port=false
+    is_aurora_shennong_houji_port=false
 fi
 
 blue "正在清理文件" "Cleaning up.."
