@@ -1,6 +1,10 @@
 #!/bin/bash
 device_code=$1
 case $device_code in
+        #15 15Pro 15Ultra 
+	DADA | HAOTIAN) size=11811160064;;
+        #14 14Pro 14Ultra
+	HOUJI | SHENNONG | AURORA) size= 8321499136;;
 	#13 13Pro 13Ultra
 	FUXI | NUWA |ISHTAR) size=9663676416;;
 	#RedmiNote12Turbo |K60Pro |MIXFold
@@ -20,5 +24,7 @@ echo $size
 #rembrandt 9126805504 |K60E
 #redwood 9126805504 |Note12ProSpeed
 #mondrian 9126805504 |K60
+#munch 9126805504 |K40S | Poco F4
 #yunluo 9126805504 |RedmiPad
 #ruby 9126805504 |Note 12 Pro
+#peridot 9126805504 |Redmi Turbo 3 | Poco F6
